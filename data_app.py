@@ -90,8 +90,16 @@ with right_column:
 
 st.markdown("---")
 
+# Sales Trend Over Time
+st.title("Sales Trend Over Time")
+sales_trend = df_selection.groupby(by=[df_selection['Date'].dt.to_period("M")])['Total'].sum().reset_index()
+sales_trend['Date'] = sales_trend['Date'].dt.to_timestamp()
+fig_sales_trend = px.line(sales_trend, x='Date', y='Total', title='Total Sales Over Time')
+st.plotly_chart(fig_sales_trend, use_container_width=True)
 # columns
 left_col,rigth_col = st.columns(2)
+
+
 
 
 # sales by product line
@@ -101,7 +109,23 @@ with left_col:
     st.title("Sales by product line")
     st.bar_chart(sales_by_product_line,horizontal=True,x_label='Total',y_label='Product line',use_container_width=True)
 
-    print(sales_by_product_line)
+    # print(sales_by_product_line)
+
+    # Sales by City
+    df_new_selection = df_selection.drop(['Date','Time'], axis=1)
+    sales_by_city = df_new_selection.groupby(by=['City']).sum()[['Total']]
+    st.title("Sales by City")
+    st.bar_chart(sales_by_city, x_label='City', y_label='Total', use_container_width=True)
+
+     # Sales by Customer Type
+    st.title("Sales by Customer Type")
+    sales_by_customer_type = df_new_selection.groupby(by=['Customer_type']).sum()[['Total']]
+    fig_customer_type_bar = px.bar(sales_by_customer_type, x=sales_by_customer_type.index, y='Total', title='Total Sales by Customer Type')
+    fig_customer_type_pie = px.pie(df_selection, names='Customer_type', values='Total', title='Sales Proportion by Customer Type')
+    st.plotly_chart(fig_customer_type_bar, use_container_width=True)
+    st.plotly_chart(fig_customer_type_pie, use_container_width=True)
+
+
 
 # sales by hour
 with rigth_col:
@@ -112,7 +136,26 @@ with rigth_col:
     st.title("Sales by hour")
     st.bar_chart(sales_by_hour,x_label='hour',y_label='Total',use_container_width=True)
 
-    print(sales_by_hour)
+    # print(sales_by_hour)
+    # Sales by Payment Method
+    # df_selection = df_selection.drop(['Date','Time'],axis=1)
+    df_selection['hour'] = df_selection['hour'].astype(int)
+    sales_by_payment = df_selection.groupby(by=['Payment']).sum()[['Total']]
+    st.title("Sales by Payment Method")
+    st.bar_chart(sales_by_payment, x_label='Payment Method', y_label='Total', use_container_width=True)
+
+
+    # Sales by Gender
+    st.title("Sales by Gender")
+    sales_by_gender = df_selection.groupby(by=['Gender']).sum()[['Total']]
+    fig_gender_bar = px.bar(sales_by_gender, x=sales_by_gender.index, y='Total', title='Total Sales by Gender')
+    fig_gender_pie = px.pie(df_selection, names='Gender', values='Total', title='Sales Proportion by Gender')
+    st.plotly_chart(fig_gender_bar, use_container_width=True)
+    st.plotly_chart(fig_gender_pie, use_container_width=True)
+
+   
+
+
 
 
 
